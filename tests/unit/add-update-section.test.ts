@@ -110,6 +110,19 @@ describe("findSectionByRef", () => {
     const trip = fresh(checklistTrip);
     expect(findSectionByRef(trip, "Nonexistent Section")).toBeNull();
   });
+
+  it("returns null instead of choosing the first duplicate heading", () => {
+    const trip = fresh(checklistTrip);
+    trip.itinerary.sections.unshift({
+      id: 99,
+      type: "textOnly",
+      mode: "placeList",
+      heading: "Notes",
+      date: null,
+      blocks: [],
+    });
+    expect(findSectionByRef(trip, "Notes")).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------

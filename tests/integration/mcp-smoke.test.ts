@@ -87,7 +87,7 @@ describe("MCP stdio server (smoke)", () => {
     expect(p.pid).toBeDefined();
   });
 
-  it("responds to tools/list with all 32 tools", async () => {
+  it("responds to tools/list with all 35 tools and organization annotations", async () => {
     const p = startServer();
     await waitForReady(p);
     await initialize(p);
@@ -122,10 +122,13 @@ describe("MCP stdio server (smoke)", () => {
       "wanderlog_list_expenses",
       "wanderlog_list_journal",
       "wanderlog_list_trips",
+      "wanderlog_move_place",
       "wanderlog_remove_expense",
       "wanderlog_remove_journal",
       "wanderlog_remove_note",
       "wanderlog_remove_place",
+      "wanderlog_reorder_places",
+      "wanderlog_reorder_sections",
       "wanderlog_rename_day",
       "wanderlog_search_guides",
       "wanderlog_search_hotels",
@@ -133,6 +136,21 @@ describe("MCP stdio server (smoke)", () => {
       "wanderlog_update_section",
       "wanderlog_update_trip_dates",
     ]);
+    const byName = new Map(
+      resp.result.tools.map((tool: { name: string; annotations?: object }) => [tool.name, tool]),
+    );
+    expect(byName.get("wanderlog_move_place")?.annotations).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    });
+    expect(byName.get("wanderlog_delete_section")?.annotations).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    });
   });
 
   it("invokes wanderlog_list_trips successfully", async () => {
